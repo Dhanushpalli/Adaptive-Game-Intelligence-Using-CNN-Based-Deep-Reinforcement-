@@ -183,7 +183,7 @@ flowchart TD
 ## 📁 5. Project Directory Structure
 
 ```text
-D:\lab task\
+workspace
 ├── Project_Report_Adaptive_Game_Intelligence.docx   # Formal Word Technical Report
 ├── README.md                                        # Complete project documentation
 ├── requirements.txt                                 # Python dependencies
@@ -236,7 +236,6 @@ D:\lab task\
 ### 2. Environment Setup
 ```powershell
 # Navigate to workspace
-cd "d:\lab task"
 
 # Activate Python virtual environment
 .\.venv\Scripts\activate
