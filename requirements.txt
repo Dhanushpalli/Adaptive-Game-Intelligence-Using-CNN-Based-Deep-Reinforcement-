@@ -1,0 +1,20 @@
+# Core Backend & Web Framework
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+websockets>=12.0
+pydantic>=2.6.0
+
+# Deep Learning & Reinforcement Learning
+torch>=2.2.0
+torchvision>=0.17.0
+gymnasium>=0.29.1
+numpy>=1.26.0
+opencv-python>=4.9.0
+
+# LLM Integration
+ollama>=0.1.7
+requests>=2.31.0
+
+# Evaluation & Metrics
+matplotlib>=3.8.0
+pandas>=2.2.0

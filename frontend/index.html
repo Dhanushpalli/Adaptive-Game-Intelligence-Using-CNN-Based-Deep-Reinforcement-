@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hunter Assassin | Adaptive Game Intelligence (DRL & LLM DDA)</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Chart.js for real-time telemetry visualizer -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="brand-badge">🗡️</div>
+        <div class="title-group">
+          <h1>HUNTER ASSASSIN <span class="edition-tag">5 LEVELS</span></h1>
+          <span class="subtitle">Vision CNN-DRL Policy &bull; Escalating Tactical Infiltration &bull; LLM DDA</span>
+        </div>
+      </div>
+      <div class="controls-top">
+        <button id="btn-sound" class="btn-sound active" title="Toggle Sound Effects">🔊 SFX ON</button>
+        <div class="mode-toggle">
+          <button id="btn-mode-human" class="mode-btn active">Human Assassin</button>
+          <button id="btn-mode-ai" class="mode-btn">AI Agent (DRL)</button>
+        </div>
+        <button id="btn-reset" class="btn-danger">Restart Level</button>
+      </div>
+    </header>
+
+    <!-- Level Selector Bar -->
+    <div class="level-nav-bar">
+      <div class="level-nav-label">
+        <span class="tac-icon">🗺️</span>
+        <span class="tac-title">TACTICAL MISSION:</span>
+        <span id="level-display-name" class="level-title-active">Level 1: Infiltration Depot</span>
+      </div>
+      <div class="level-button-group">
+        <button class="lvl-btn active" data-lvl="1">LEVEL 1</button>
+        <button class="lvl-btn" data-lvl="2">LEVEL 2</button>
+        <button class="lvl-btn" data-lvl="3">LEVEL 3</button>
+        <button class="lvl-btn" data-lvl="4">LEVEL 4</button>
+        <button class="lvl-btn" data-lvl="5">LEVEL 5</button>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="grid-layout">
+      <!-- Left Panel: Telemetry & Status -->
+      <aside class="panel side-panel">
+        <div class="card tactical-card">
+          <h2>📊 MISSION TELEMETRY</h2>
+          <div class="stat-row">
+            <span class="label">Current Level:</span>
+            <span id="stat-level" class="val highlight">1 / 5</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Survival Time:</span>
+            <span id="stat-survival" class="val highlight">0.0s</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Diamonds Looted:</span>
+            <span id="stat-gems-left" class="val gem-highlight">💎 0</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Mission Score:</span>
+            <span id="stat-score" class="val highlight">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Assassin Vitality:</span>
+            <div class="health-bar-container">
+              <div id="health-bar" class="health-bar-fill" style="width: 100%;"></div>
+            </div>
+            <span id="stat-health" class="val-sub">100 / 100</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Flashlight Dodges:</span>
+            <span id="stat-dodges" class="val">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Loot Gathered:</span>
+            <span id="stat-collectibles" class="val">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Wounds Sustained:</span>
+            <span id="stat-damage" class="val danger">0</span>
+          </div>
+        </div>
+
+        <div class="card tactical-card">
+          <h2>⚙️ LEVEL DIFFICULTY & DDA</h2>
+          <div class="badge-container">
+            <span class="label">Difficulty Tier:</span>
+            <span id="badge-tier" class="badge">Recruit</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Obstacle Barriers:</span>
+            <span id="stat-obstacles-count" class="val highlight">6 Blocks</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Guard Speed Mult:</span>
+            <span id="stat-speed-mult" class="val">0.9x</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Reinforcement Rate:</span>
+            <span id="stat-spawn-rate" class="val">4.0s</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">Tactical Threat Event:</span>
+            <span id="stat-event" class="val warning">None</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">LLM Game Master:</span>
+            <span id="ollama-status" class="val status-indicator">Checking...</span>
+          </div>
+        </div>
+
+        <div class="card chart-card tactical-card">
+          <h2>📈 VITALITY & SURVIVAL LOG</h2>
+          <canvas id="telemetryChart" height="135"></canvas>
+        </div>
+      </aside>
+
+      <!-- Center: Hunter Assassin Canvas -->
+      <section class="canvas-section">
+        <!-- Hunter Assassin In-Game Tactical HUD Bar -->
+        <div class="assassin-hud-bar">
+          <div class="hud-pill hud-level">
+            <span class="hud-icon">⭐</span>
+            <span class="hud-label">LEVEL</span>
+            <span id="val-level" class="hud-num">1</span>
+          </div>
+          <div class="hud-pill hud-gems">
+            <span class="hud-icon">💎</span>
+            <span class="hud-label">DIAMONDS</span>
+            <span id="val-diamonds" class="hud-num">0</span>
+          </div>
+          <div class="hud-pill hud-targets">
+            <span class="hud-icon">🎯</span>
+            <span class="hud-label">GUARDS</span>
+            <span id="val-targets" class="hud-num">0</span>
+          </div>
+          <div class="hud-pill hud-stealth">
+            <span id="stealth-indicator" class="stealth-tag stealth-shadow">
+              <span class="pulse-dot"></span> <span id="stealth-text">SHADOW STEALTH</span>
+            </span>
+          </div>
+          <div class="hud-pill hud-time">
+            <span class="hud-icon">⏱️</span>
+            <span id="val-time" class="hud-num">0.0s</span>
+          </div>
+        </div>
+
+        <!-- Mission Objective Banner -->
+        <div class="mission-objective-banner">
+          <span class="obj-badge">MISSION DIRECTIVE</span>
+          <span id="obj-text" class="obj-text">Infiltrate from Green Drop Zone ➔ Evade Guards ➔ Reach Extraction Helipad [H]</span>
+          <span id="obj-dist" class="obj-dist">📍 DIST: 340m</span>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="gameCanvas" width="600" height="600"></canvas>
+
+          <!-- Game Over Modal -->
+          <div id="game-overlay" class="overlay hidden">
+            <div class="overlay-card hunter-modal">
+              <div class="modal-icon">💀</div>
+              <h2>ASSASSIN DOWN</h2>
+              <div class="modal-reward">
+                <span class="reward-sparkle">✨</span>
+                <span id="overlay-gems" class="reward-text">+0 💎</span>
+                <span class="reward-sparkle">✨</span>
+              </div>
+              <p id="overlay-stats">Mission aborted. Surviving: 0s &bull; Score: 0</p>
+              <button id="btn-overlay-restart" class="btn-primary hunter-deploy-btn">DEPLOY AGAIN</button>
+            </div>
+          </div>
+
+          <!-- Level Completed Modal -->
+          <div id="level-complete-overlay" class="overlay hidden">
+            <div class="overlay-card level-win-modal">
+              <div class="modal-icon">🚁</div>
+              <div class="stars-rating">⭐⭐⭐</div>
+              <h2 id="win-level-title">LEVEL 1 COMPLETED!</h2>
+              <p class="win-sub">Extraction helipad secured. Area clean.</p>
+              <div class="modal-reward">
+                <span class="reward-sparkle">✨</span>
+                <span id="win-level-bonus" class="reward-text">+300 💎 LEVEL BONUS</span>
+                <span class="reward-sparkle">✨</span>
+              </div>
+              <p id="win-level-stats">Mission Time: 12.4s &bull; Guard Evades: 5</p>
+              <button id="btn-next-level" class="btn-primary level-next-btn">PROCEED TO LEVEL 2 ➔</button>
+            </div>
+          </div>
+
+          <!-- Campaign Conquered Modal (Level 5 Win) -->
+          <div id="campaign-win-overlay" class="overlay hidden">
+            <div class="overlay-card campaign-win-modal">
+              <div class="modal-icon">🏆</div>
+              <div class="stars-rating">⭐⭐⭐⭐⭐</div>
+              <h2>CAMPAIGN CONQUERED!</h2>
+              <p class="win-sub">All 5 Citadel security sectors eradicated. Master Assassin status awarded!</p>
+              <div class="modal-reward">
+                <span class="reward-sparkle">✨</span>
+                <span id="campaign-total-gems" class="reward-text">+1500 💎 CITADEL MASTER</span>
+                <span class="reward-sparkle">✨</span>
+              </div>
+              <p id="campaign-stats">Total Score: 2450 &bull; Total Dodges: 28</p>
+              <button id="btn-campaign-restart" class="btn-primary level-next-btn">REPLAY CAMPAIGN</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructions">
+          <span>🎯 <strong>Click / Tap anywhere</strong> to Dash along curved orange path &bull; Move from <strong style="color:#00e676;">🟢 START</strong> to <strong style="color:#00e5ff;">🔷 HELIPAD [H]</strong> &bull; Evade Flashlight Cones</span>
+        </div>
+      </section>
+
+      <!-- Right Panel: CNN Visualizer & LLM Feedback -->
+      <aside class="panel side-panel">
+        <div class="card tactical-card">
+          <h2>🧠 CNN PERCEPTION (CONV3)</h2>
+          <p class="desc">Neural visual grid activations processed by DRL vision layers:</p>
+          <div class="cnn-container">
+            <canvas id="cnnCanvas" width="140" height="140"></canvas>
+          </div>
+          <div class="q-actions">
+            <span class="label">Policy Action Q-Confidence:</span>
+            <div class="q-bar-group">
+              <div class="q-item"><span>Idle</span><div class="bar"><div id="q-0" class="fill"></div></div></div>
+              <div class="q-item"><span>Up</span><div class="bar"><div id="q-1" class="fill"></div></div></div>
+              <div class="q-item"><span>Down</span><div class="bar"><div id="q-2" class="fill"></div></div></div>
+              <div class="q-item"><span>Left</span><div class="bar"><div id="q-3" class="fill"></div></div></div>
+              <div class="q-item"><span>Right</span><div class="bar"><div id="q-4" class="fill"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card feedback-card tactical-card">
+          <h2>🤖 GAME MASTER COMMS</h2>
+          <div class="chat-box" id="llm-log-box">
+            <div class="log-entry system">
+              <span class="time">[HQ UPLINK]</span> Connected to Adaptive DDA service. Monitoring operative telemetry.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="js/websocket.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
