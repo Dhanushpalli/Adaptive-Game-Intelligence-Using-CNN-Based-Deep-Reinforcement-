@@ -1,4 +1,4 @@
-# Hunter Assassin Adaptive AI: Deep Reinforcement Learning with Dynamic Difficulty Adjustment (DDA)
+# Adaptive Game intelligence using CNN based Deep Reinforcement Learning
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688.svg)](https://fastapi.tiangolo.com/)
